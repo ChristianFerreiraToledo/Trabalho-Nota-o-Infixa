@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct elemento{
     char caracter;
@@ -53,8 +54,71 @@ void liberarPilha(PILHA *pilha){
     return;
 }
 
+char *infixaParaPosfixa (char *inf) {
+   int n = strlen (inf);
+   char *posf; 
+   posf = malloc ((n+1) * sizeof (char));
+   PILHA *p;
+   p = criar_pilha ();
+   empilhar (p, inf[0]);       // empilha '('
+
+   int j = 0;
+   for (int i = 1; inf[i] != '\0'; ++i) {
+      switch (inf[i]) {
+         char x;
+         case '(': empilhar (p, inf[i]);
+                   break;
+         case ')': x = desempilhar (p);
+                   while (x != '(') {
+                      posf[j++] = x;
+                      x = desempilhar (p);
+                   }
+                   break;
+         case '+' || '-': x = desempilhar (p);
+                   while (x != '(') {
+                      posf[j++] = x;
+                      x = desempilhar (p);
+                   }
+                   empilhar (p, x);
+                   empilhar (p, inf[i]);
+                   break;
+         case '*' || '/': x = desempilhar (p);
+                   while (x != '(' && x != '+' && x != '-') {
+                      posf[j++] = x;
+                      x = desempilhar (p);
+                   }
+                   empilhar (p, x);
+                   empilhar (p, inf[i]);
+                   break;
+
+         case '^': x = desempilhar(p);
+                   while(x != '(' && x != '+' && x != '-' && x != '*' && x != '/'){
+                    posf[j++] = x;
+                    x = desempilhar(p);
+                   }
+                   empilhar(p, x);
+                   empilhar(p, inf[i]);
+                   break;
+         default:  posf[j++] = inf[i];
+      }
+   }
+   posf[j] = '\0';
+   //printf("%p\n", (void*)p->topo);
+   liberarPilha(p);
+   //printf("%p\n", (void*)p->topo);  
+   return posf;
+
+}
+
 int main(int argc, char * argv[]){
 
+    char infixa[100];
+
+    scanf("%s", infixa);
+
+    char *posfixa = infixaParaPosfixa (infixa);
+
+    printf("%s\n", posfixa);
 
     return 0;
 }
